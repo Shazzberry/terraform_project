@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_launch_configuration" "example" {
   image_id        = "ami-40d28157"
   instance_type   = "t2.micro"
@@ -30,13 +26,13 @@ resource "aws_autoscaling_group" "example" {
 
   tag {
     key                 = "Name"
-    value               = "terraform-asg-example"
+    value               = "${var.cluster_name}-example"
     propagate_at_launch = true
   }
 }
 
 resource "aws_security_group" "instance" {
-  name = "terraform-example-instance"
+  name = "${var.cluster_name}-instance"
 
   ingress {
     from_port   = "${var.server_port}"
@@ -53,7 +49,7 @@ resource "aws_security_group" "instance" {
 data "aws_availability_zones" "all" {}
 
 resource "aws_elb" "example" {
-  name               = "terraform-asg-example"
+  name               = "${var.cluster_name}-example"
   availability_zones = ["${data.aws_availability_zones.all.names}"]
   security_groups    = ["${aws_security_group.elb.id}"]
 
@@ -74,7 +70,7 @@ resource "aws_elb" "example" {
 }
 
 resource "aws_security_group" "elb" {
-  name = "terraform-example-elb"
+  name = "${var.cluster_name}-elb"
 
   ingress {
     from_port   = 80
@@ -88,5 +84,15 @@ resource "aws_security_group" "elb" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+data "terraform_remote_state" "db" {
+  backend = "s3"
+
+  config {
+    bucket = "shazzs-terraform-project"
+    key = "dev/data-stores/mysql/terraform.tfstate"
+    region "us-east-1"
   }
 }
