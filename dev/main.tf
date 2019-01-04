@@ -69,7 +69,7 @@ resource "aws_elb" "example" {
     unhealthy_threshold = 2
     timeout             = 3
     interval            = 30
-    target              = "http:${var.server_port}/"
+    target              = "HTTP:${var.server_port}/"
   }
 }
 
@@ -89,8 +89,4 @@ resource "aws_security_group" "elb" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-output "elb_dns_name" {
-  value = "${aws_elb.example.dns_name}"
 }
