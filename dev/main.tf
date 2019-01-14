@@ -92,7 +92,7 @@ data "terraform_remote_state" "db" {
 
   config {
     bucket = "shazzs-terraform-project"
-    key = "dev/data-stores/mysql/terraform.tfstate"
-    region "us-east-1"
+    key    = "dev/data-stores/mysql/terraform.tfstate"
+    region = "us-east-1"
   }
 }
