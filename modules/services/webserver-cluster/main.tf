@@ -28,16 +28,19 @@ resource "aws_autoscaling_group" "example" {
 resource "aws_security_group" "instance" {
   name = "${var.cluster_name}-instance"
 
-  ingress {
-    from_port   = "${var.server_port}"
-    to_port     = "${var.server_port}"
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_security_group_rule" "allow_server_http_inbound" {
+  type              = "ingress"
+  security_group_id = "${aws_security_group.instance.id}"
+
+  from_port   = "${var.server_port}"
+  to_port     = "${var.server_port}"
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
 data "template_file" "user_data" {
