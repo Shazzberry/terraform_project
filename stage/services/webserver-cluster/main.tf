@@ -23,13 +23,3 @@ resource "aws_security_group_rule" "allow_testing_inbound" {
   protocol    = "tcp"
   cidr_blocks = ["0.0.0.0/0"]
 }
-
-data "terraform_remote_state" "db" {
-  backend = "s3"
-
-  config {
-    bucket = "shazzs-terraform-project"
-    key    = "stage/data-stores/mysql/terraform.tfstate"
-    region = "us-east-1"
-  }
-}
