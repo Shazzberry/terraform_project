@@ -82,7 +82,7 @@ resource "aws_security_group" "elb" {
 
 resource "aws_security_group_rule" "allow_http_inbound"{
   type               = "ingress"
-  security_group_id  = "${aws_security_group_elb.id}"
+  security_group_id  = "${aws_security_group.elb.id}"
   
   from_port   = 80
   to_port     = 80
