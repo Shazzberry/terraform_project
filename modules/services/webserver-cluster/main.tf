@@ -78,7 +78,7 @@ resource "aws_elb" "example" {
 
 resource "aws_security_group" "elb" {
   name = "${var.cluster_name}-elb"  
-
+}
 
 resource "aws_security_group_rule" "allow_http_inbound"{
   type               = "ingress"
