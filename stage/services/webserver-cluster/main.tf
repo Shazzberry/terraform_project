@@ -14,14 +14,14 @@ module "webserver_cluster" {
   max_size      = 2
 }
 
-data "template_file" "user_data" {
-  template = "${file("user-data.sh")}"
+resource "aws_security_group_rule" "allow_testing_inbound" {
+  type              = "ingress"
+  security_group_id = "${module.webserver_cluster.elb_security_group_id}"
 
-  vars {
-    server_port = "${var.server_port}"
-    db_address  = "${data.terraform_remote_state.db.address}"
-    db_port     = "${data.terraform_remote_state.db.port}"
-  }
+  from_port   = 12345
+  to_port     = 12345
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
 data "terraform_remote_state" "db" {
