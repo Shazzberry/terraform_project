@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "allow_server_http_inbound" {
 }
 
 data "template_file" "user_data" {
-  template = "${file("user-data.sh")}"
+  template = "${file("${path.module}/user-data.sh")}"
 
   vars {
     server_port = "${var.server_port}"
