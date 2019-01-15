@@ -1,13 +1,8 @@
 resource "aws_launch_configuration" "example" {
   image_id        = "ami-40d28157"
-  instance_type   = "t2.micro"
+  instance_type   = "${var.instance_type}"
   security_groups = ["${aws_security_group.instance.id}"]
-
-  user_data = <<-EOF
-              #!/bin/bash
-              echo "Hello, World" > index.html
-              nohup busybox httpd -f -p "${var.server_port}" &
-              EOF
+  user_data       = "${data.template_file.user_data.rendered}"
 
   lifecycle {
     create_before_destroy = true
@@ -17,16 +12,15 @@ resource "aws_launch_configuration" "example" {
 resource "aws_autoscaling_group" "example" {
   launch_configuration = "${aws_launch_configuration.example.id}"
   availability_zones   = ["${data.aws_availability_zones.all.names}"]
+  load_balancers       = ["${aws_elb.example.name}"]
+  health_check_type    = "ELB"
 
-  load_balancers    = ["${aws_elb.example.name}"]
-  health_check_type = "ELB"
-
-  min_size = 2
-  max_size = 10
+  min_size = "${var.min_size}"
+  max_size = "${var.max_size}"
 
   tag {
     key                 = "Name"
-    value               = "${var.cluster_name}-example"
+    value               = "${var.cluster_name}"
     propagate_at_launch = true
   }
 }
@@ -91,8 +85,8 @@ data "terraform_remote_state" "db" {
   backend = "s3"
 
   config {
-    bucket = "shazzs-terraform-project"
-    key    = "dev/data-stores/mysql/terraform.tfstate"
+    bucket = "${var.db_remote_state_bucket}"
+    key    = "${var.db_remote_state_key}"
     region = "us-east-1"
   }
 }
